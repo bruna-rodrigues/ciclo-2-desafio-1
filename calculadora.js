@@ -1,31 +1,67 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const dadosMesaForm = document.getElementById("dadosMesa");
+    const botaoCalcular = document.getElementById("iniciarCalculo");
+    const modalPagamento = document.getElementById("metodoPagamento");
+    
+    const semDesconto = document.getElementById("semDesconto");
+    const comDesconto = document.getElementById("comDesconto");
 
+    const modalResultado = document.getElementById("modalResultado");
+    const textoResultado = document.getElementById("resultadoConta");
 
-function calcularPagamento() {
-    // Recupera os valores dos campos do formulário
-    const valorConta = parseFloat(document.getElementById("valor").value);
-    const numeroPessoas = parseInt(document.getElementById("pessoas").value);
-    const metodo = parseInt(document.getElementById("metodo").value);
-    const gorjeta = document.getElementById("gorjeta").checked ? valorConta * 0.1 : 0;
+    const fecharBotoes = document.querySelectorAll('.close');
 
-    // Executa a lógica JavaScript original com base nos valores do formulário
-    let pagamentoCliente = valorConta / numeroPessoas;
-
-    if (gorjeta > 0) {
-        pagamentoCliente += gorjeta;
-    }
-
-    while(true){
-        console.log("Método de pagamento:");
-        if(metodo === 1) {
-            let desconto = (pagamentoCliente / 100) * 10;
-            let pagamento = pagamentoCliente - desconto;
-            alert("Adicionado 10% de desconto!!\nO total deste cliente é: R$" + pagamento.toFixed(2));
-            break;
-        } else if(metodo === 2) { 
-            alert("O total deste cliente é: R$" + pagamentoCliente.toFixed(2));
-            break;
+    botaoCalcular.addEventListener('click', function () {
+        if (dadosMesaForm.checkValidity()) {
+                modalPagamento.style.display = "block";
+        }else{
+            alert("Por favor, preencha todos os campos corretamente.");
         }
-    }
-}
+});
 
+    semDesconto.addEventListener("click", function(){
+        calcularMesa(false);
+        modalPagamento.style.display = "none";
+    });
+
+    comDesconto.addEventListener("click", function(){
+        calcularMesa(true);
+        modalPagamento.style.display = "none"
+    })
+
+    fecharBotoes.forEach(function (button) {
+        button.addEventListener("click", function () {
+        modalPagamento.style.display = 'none';
+        modalResultado.style.display = 'none';
+    });
+});
+
+    window.addEventListener('click', function (event) {
+        if (event.target == modalPagamento || event.target == modalResultado) {
+            modalPagamento.style.display = 'none';
+            modalResultado.style.display = 'none';
+        }
+});
+
+
+    function calcularMesa(temDesconto) {
+        const valorConta = parseFloat(document.getElementById("valorConta").value);
+        const opcaoTaxa = parseFloat(document.getElementById("opcaoTaxa").value);
+        const numeroPessoas = parseFloat(document.getElementById("numeroPessoas").value);
+
+        let totalPorPessoa = (valorConta + opcaoTaxa) / numeroPessoas;
+        let desconto = 0;
+
+            if (temDesconto){
+            desconto = totalPorPessoa * 0.1;
+        }
+
+        let verificaDesconto = temDesconto ? `Desconto Aplicado: ${desconto.toFixed(2)} R$` : "Sem Desconto";
+            textoResultado.innerHTML = `Total do consumo: ${valorConta.toFixed(2)} R$ <br>
+                                    Taxa de serviço: ${opcaoTaxa.toFixed(2)} R$ <br>
+                                    ${verificaDesconto} <br>
+                                    Total por pessoa: ${(totalPorPessoa - desconto).toFixed(2)} R$ <br>`
+                                        modalResultado.style.display = "block";
+}
+});
 
